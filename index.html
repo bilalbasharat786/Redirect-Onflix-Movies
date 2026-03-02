@@ -9,18 +9,35 @@
 </head>
 <body class="bg-gray-900 flex items-center justify-center min-h-screen flex-col text-center px-4">
     
-    <h1 class="text-4xl font-extrabold text-red-600 mb-2">OnFlix Movies</h1>
-    <p class="text-gray-400 mb-8 font-medium">Please verify you are a human to enter the site.</p>
+    <h1 class="text-5xl font-extrabold text-red-600 mb-2">OnFlix Movies</h1>
+    <p class="text-gray-400 mb-8 font-medium">Your Ultimate Destination for Movies.</p>
 
-<div class="cf-turnstile" data-sitekey="0x4AAAAAACkvuRqmnf-K5K7q" data-callback="redirectUser"></div>
+    <div id="welcome-section">
+        <button 
+            onclick="startVerification()" 
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transform transition hover:scale-105 active:scale-95"
+        >
+            GO TO HOME
+        </button>
+    </div>
+
+    <div id="verification-section" class="hidden">
+        <p class="text-gray-300 mb-4 animate-pulse">Verifying your connection...</p>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACkvuRqmnf-K5K7q" data-callback="redirectUser"></div>
+    </div>
 
     <script>
-        // Jab user Verify par tick kar dega, toh yeh function chalega
+        // 1. Jab user button dabaye toh verification dikhao
+        function startVerification() {
+            document.getElementById('welcome-section').classList.add('hidden');
+            document.getElementById('verification-section').classList.remove('hidden');
+        }
+
+        // 2. Jab verification complete ho jaye toh redirect karo
         function redirectUser(token) {
-            // Asli movies wali site ka link yahan daalo
-            const mainWebsite = "https://on-flix-movies-a7we.vercel.app";
+            const secretCode = "aHR0cHM6Ly9vbi1mbGl4LW1vdmllcy1hN3dlLnZlcmNlbC5hcHA=";
+            const mainWebsite = atob(secretCode);
             
-            // 2 second ka delay taake user ko "Success" nazar aaye, phir redirect!
             setTimeout(() => {
                 window.location.href = mainWebsite;
             }, 1500);
