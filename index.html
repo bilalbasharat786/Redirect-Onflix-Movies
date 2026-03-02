@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifying... | OnFlix</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 flex items-center justify-center min-h-screen flex-col text-center px-4">
@@ -23,17 +23,25 @@
 
     <div id="verification-section" class="hidden">
         <p class="text-gray-300 mb-4 animate-pulse">Verifying your connection...</p>
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAACkvuRqmnf-K5K7q" data-callback="redirectUser"></div>
+        <div id="turnstile-container"></div>
     </div>
 
     <script>
-        // 1. Jab user button dabaye toh verification dikhao
+        // Jab user button dabaye tabhi verification start hogi
         function startVerification() {
+            // UI Change karo
             document.getElementById('welcome-section').classList.add('hidden');
             document.getElementById('verification-section').classList.remove('hidden');
+
+            // 🔥 Ab verification widget ko manually load karo
+            turnstile.render('#turnstile-container', {
+                sitekey: '0x4AAAAAACkvuRqmnf-K5K7q',
+                callback: function(token) {
+                    redirectUser(token);
+                },
+            });
         }
 
-        // 2. Jab verification complete ho jaye toh redirect karo
         function redirectUser(token) {
             const secretCode = "aHR0cHM6Ly9vbi1mbGl4LW1vdmllcy1hN3dlLnZlcmNlbC5hcHA=";
             const mainWebsite = atob(secretCode);
