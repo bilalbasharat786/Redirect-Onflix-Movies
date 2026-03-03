@@ -43,6 +43,7 @@
         }
 
         function redirectUser(token) {
+            sessionStorage.setItem("onflix_verified", "true");
             const secretCode = "aHR0cHM6Ly9vbi1mbGl4LW1vdmllcy1hN3dlLnZlcmNlbC5hcHA=";
             const mainWebsite = atob(secretCode);
             
