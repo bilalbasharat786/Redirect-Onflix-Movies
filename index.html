@@ -3,66 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifying Connection | StreamFree</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #dc2626; /* Red-600 */
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 24px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .title { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #9ca3af; letter-spacing: 3px; }
-        .subtitle { font-size: 14px; color: #4b5563; }
-        /* Turnstile div ko chupa diya taake silently verify ho */
-        .cf-turnstile { margin-top: 20px; display: none; }
-    </style>
+    <title>Verifying... | StreamFree</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="spinner" id="spinner"></div>
-    <div class="title" id="status-title">VERIFYING CONNECTION</div>
-    <div class="subtitle" id="status-desc">Ensuring you are not a bot...</div>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen flex-col text-center px-4">
 
-    <div class="cf-turnstile" data-sitekey="0x4AAAAAAC5iBup6tFFw1Smo" data-callback="onSuccess" data-error-callback="onError"></div>
+    <h1 class="text-5xl font-extrabold text-red-600 mb-2">StreamFree</h1>
+    <p class="text-gray-400 mb-8 font-medium">Your Ultimate Destination for Movies & Series.</p>
+
+    <div id="welcome-section">
+        <button 
+            onclick="startVerification()" 
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-[0_0_15px_rgba(220,38,38,0.5)] transform transition hover:scale-105 active:scale-95"
+        >
+            GO TO HOME
+        </button>
+    </div>
+
+    <div id="verification-section" class="hidden flex flex-col items-center">
+        <p id="status-text" class="text-gray-300 mb-4 animate-pulse">Verifying your connection...</p>
+        <div id="turnstile-container"></div>
+    </div>
 
     <script>
-        function onSuccess(token) {
-            document.getElementById('status-title').innerText = "VERIFICATION SUCCESSFUL";
-            document.getElementById('status-title').style.color = "#22c55e"; // Green color
-            document.getElementById('status-desc').innerText = "Redirecting to StreamFree Network...";
-            
-            // 1.5 seconds delay ke baad asli website par bhejna with Secret Tokens
-            setTimeout(() => {
-                window.location.href = "https://onflixstream.vercel.app/?verified=true&pass=streamfree2026";
-            }, 1500);
+        // 1. Jab user button dabaye toh verification dikhao aur start karo
+        function startVerification() {
+            // UI Change karo (Button hide, Verifying text show)
+            document.getElementById('welcome-section').classList.add('hidden');
+            document.getElementById('verification-section').classList.remove('hidden');
+
+            // 🔥 Turnstile Widget ko manually load karo
+            turnstile.render('#turnstile-container', {
+                sitekey: '0x4AAAAAAC5iBup6tFFw1Smo', // Aap ki asal Site Key
+                callback: function(token) {
+                    redirectUser(token);
+                },
+                "error-callback": function() {
+                    document.getElementById('status-text').innerText = "Verification Failed. Access Denied.";
+                    document.getElementById('status-text').classList.remove('animate-pulse');
+                    document.getElementById('status-text').classList.add('text-red-500', 'font-bold');
+                }
+            });
         }
 
-        function onError() {
-            document.getElementById('spinner').style.display = "none";
-            document.getElementById('status-title').innerText = "VERIFICATION FAILED";
-            document.getElementById('status-title').style.color = "#dc2626"; // Red color
-            document.getElementById('status-desc').innerText = "Access Denied. Are you a bot?";
+        // 2. Verification complete hone par Redirect karo
+        function redirectUser(token) {
+            // Success Text Update
+            document.getElementById('status-text').innerText = "Verification Successful! Redirecting...";
+            document.getElementById('status-text').classList.remove('animate-pulse');
+            document.getElementById('status-text').classList.add('text-green-500', 'font-bold');
+
+            // 🔥 JADU: Base64 Encoded URL (Aap ki website ka link with ?verified=true&pass=streamfree2026)
+            const secretCode = "aHR0cHM6Ly9vbmZsaXhzdHJlYW0udmVyY2VsLmFwcC8/dmVyaWZpZWQ9dHJ1ZSZwYXNzPXN0cmVhbWZyZWUyMDI2";
+            const mainWebsite = atob(secretCode);
+
+            // 1 second ka delay taake user success text dekh sake
+            setTimeout(() => {
+                window.location.href = mainWebsite;
+            }, 1000);
         }
     </script>
+
 </body>
 </html>
